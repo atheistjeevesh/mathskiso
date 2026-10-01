@@ -10,7 +10,7 @@ const sayP = (t, m = 'think') => ({ k: 'say', who: 'jess', m, t });
 function showQ(ex, n, q, f, lhs, val, x0, o = {}) {
   const v = o.view || [x0 - 2.5, x0 + 2.5];
   return { ex, n, q, scene: 'calc', f, lhs, val, x0,
-    setup: (W) => { calcView(W, f, v[0], v[1], { y: o.y }); W.a = x0; W.tan = true; W.read = true; grabCalc(W); if (o.cap) W.pl.caption = o.cap; },
+    setup: (W) => { calcView(W, f, v[0], v[1], { y: o.y, fit: true }); W.a = x0; W.tan = true; W.read = true; grabCalc(W); if (o.cap) W.pl.caption = o.cap; },
     parts: [...(o.steps || []), { k: 'num', q: o.nq || 'Live check: the left side at x = ' + fmtN(x0, 3) + ' = ?', a: val, tol: 0.011, show: cell(val), x: 'Numerically ' + fmtN(lhs(x0), 4) + ': it holds.' }],
     w: [o.w || q.replace(/^.*show that /i, '')] };
 }

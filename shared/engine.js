@@ -510,7 +510,7 @@ function qStep(E) {
     if (E.intro) { await E.intro(W); guard(g); }
     if (!E.noSolve) { await cont(E.parts.length > 1 ? 'Solve it · ' + E.parts.length + ' steps' : 'Solve it'); guard(g); }
     for (const [i, p] of E.parts.entries()) {
-      if (p.pre) { await p.pre(W); guard(g); }
+      if (typeof p.pre === 'function') { await p.pre(W); guard(g); }
       if (p.k === 'say') { await say(p.who || 'jess', p.m || 'idle', p.t); guard(g); continue; }
       if (p.k === 'run') { await p.run(W); guard(g); continue; }
       const r = await ask(p); guard(g);

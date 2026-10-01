@@ -21,15 +21,17 @@ MINI.calc = {
     if (W.app) { const A = W.app, d = Math.max(A.d, 1e-6); for (const [sg, col] of [[-1, C.beni], [1, C['matcha-deep']]]) { const x = A.a + sg * d, y = W.F(x); if (!isFinite(y)) continue; const s = toS(x, y); D.line([[x, 0], [x, y]], col, 1.5, [4, 4]); ctx.beginPath(); ctx.arc(s[0], s[1], 8, 0, 7); ctx.fillStyle = col; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.stroke(); }
       D.line([[A.a, by0], [A.a, by1]], C['ink-muted'], 1.5, [6, 5]); lines.push(['x → ' + fmtN(A.a, 3) + '⁻: f = ' + fmt4(W.F(A.a - d)), C.beni], ['x → ' + fmtN(A.a, 3) + '⁺: f = ' + fmt4(W.F(A.a + d)), C['matcha-deep']], ['distance ' + fmtN(d, 4), C['ink-muted']]); }
     if (W.a != null) { const a = W.a, fa = W.F(a); const P = [a, fa];
-      if (W.h != null && Math.abs(W.h) > 1e-9) { const Q = [a + W.h, W.F(a + W.h)], m = (Q[1] - P[1]) / W.h; D.line([[bx0, P[1] + m * (bx0 - a)], [bx1, P[1] + m * (bx1 - a)]], C.beni, 2.5); D.dot(Q[0], Q[1], 8, C.panel, C.beni, 3); lines.push(['h = ' + fmtN(W.h, 4), C.ink], ['secant slope ' + fmt4(m), C.beni]); }
-      if (W.tan) { const m = ND(W.F, a); D.line([[bx0, fa + m * (bx0 - a)], [bx1, fa + m * (bx1 - a)]], C['matcha-deep'], 3, [9, 5]); lines.push(['tangent slope ' + fmt4(m), C['matcha-deep']]); }
-      const s = toS(...P); ctx.beginPath(); ctx.arc(s[0], s[1], 10, 0, 7); ctx.fillStyle = C.kin; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5; ctx.stroke(); lines.unshift(['x = ' + fmtN(a, 3) + ',  ' + W.fLab + '(x) = ' + fmt4(fa), C.ink]); }
+      if (W.h != null && Math.abs(W.h) > 1e-9) { const Q = [a + W.h, W.F(a + W.h)], m = (Q[1] - P[1]) / W.h; D.line([[bx0, P[1] + m * (bx0 - a)], [bx1, P[1] + m * (bx1 - a)]], C.beni, 2.5); D.dot(Q[0], Q[1], 8, C.panel, C.beni, 3); lines.push(['h = ' + fmtN(W.h, 4), C.ink], ['secant slope ' + fmt4(m * (W.ys || 1)), C.beni]); }
+      if (W.tan) { const m = ND(W.F, a); D.line([[bx0, fa + m * (bx0 - a)], [bx1, fa + m * (bx1 - a)]], C['matcha-deep'], 3, [9, 5]); lines.push(['tangent slope ' + fmt4(m * (W.ys || 1)), C['matcha-deep']]); }
+      const s = toS(...P); ctx.beginPath(); ctx.arc(s[0], s[1], 10, 0, 7); ctx.fillStyle = C.kin; ctx.fill(); ctx.strokeStyle = C.ink; ctx.lineWidth = 2.5; ctx.stroke(); lines.unshift(['x = ' + fmtN(a, 3) + ',  ' + W.fLab + '(x) = ' + fmt4(fa * (W.ys || 1)), C.ink]); }
     if (W.read && lines.length) { const bw = Math.max(...lines.map((l) => l[0].length)) * 7.2 + 16, bh = lines.length * 17 + 8; ctx.fillStyle = C.panel; ctx.strokeStyle = C.ink; ctx.lineWidth = 2; ctx.fillRect(8, 8, bw, bh); ctx.strokeRect(8, 8, bw, bh); lines.forEach(([t, col], i) => D.text(t, 16, 24 + i * 17, { size: 12.5, w: 800, align: 'left', col })); }
   },
 };
 function calcView(W, F, x0, x1, o = {}) {
   let lo = Infinity, hi = -Infinity; const ys = []; for (let i = 0; i <= 200; i++) { const y = F(x0 + ((x1 - x0) * i) / 200); if (isFinite(y)) ys.push(y); } ys.sort((p, q) => p - q);
   if (ys.length) { lo = ys[Math.floor(ys.length * 0.05)]; hi = ys[Math.floor(ys.length * 0.95)]; } if (o.y) [lo, hi] = o.y; if (!(hi > lo)) { lo -= 1; hi += 1; }
+  W.ys = 1; if (W.pl) W.pl.fy = null;
+  if (o.fit && (hi - lo) / (x1 - x0) > 1.4) { const ys = (hi - lo) / ((x1 - x0) * 0.55); W.ys = ys; lo /= ys; hi /= ys; const G = F; F = (x) => G(x) / ys; W.pl.fy = (y) => { const v = y * ys; return fmtN(v, Math.abs(v) >= 100 ? 0 : Math.abs(v) >= 10 ? 1 : 2); }; }
   const pad = (hi - lo) * 0.18 + 0.3; planeView(W, x0, x1, Math.min(lo - pad, -0.3), Math.max(hi + pad, 0.3)); W.F = F;
 }
 /* drag P along the curve (x snaps to 0.05); optional draggable Q for the secant */

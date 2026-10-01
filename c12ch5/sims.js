@@ -85,7 +85,7 @@ function parSlider(W, snap = 0.01) { return slider(W.tn + ' (slide me)', W.t0, W
 function dQ(ex, n, q, f, df, opts, x0, o = {}) {
   const v = o.view || [x0 - 2.5, x0 + 2.5];
   return { ex, n, q, scene: 'calc', kim: o.kim, f, df, x0,
-    setup: (W) => { calcView(W, f, v[0], v[1], { y: o.y }); W.a = clamp(v[0] + (v[1] - v[0]) * 0.2, v[0], v[1]); if (!isFinite(f(W.a))) W.a = x0 - (v[1] - v[0]) * 0.15; W.tan = true; W.read = true; grabCalc(W, { snap: o.snap }); if (o.cap) W.pl.caption = o.cap; },
+    setup: (W) => { calcView(W, f, v[0], v[1], { y: o.y, fit: true }); W.a = clamp(v[0] + (v[1] - v[0]) * 0.2, v[0], v[1]); if (!isFinite(f(W.a))) W.a = x0 - (v[1] - v[0]) * 0.15; W.tan = true; W.read = true; grabCalc(W, { snap: o.snap }); if (o.cap) W.pl.caption = o.cap; },
     parts: [...(o.steps || []), { k: 'mcq', q: o.mq || 'dy/dx = ?', o: opts, a: 0, x: o.x || plain(opts[0]) + '.' },
       ...(o.noDrag ? [] : [{ k: 'task', q: 'Drag P to x = ' + (o.x0s || fmtN(x0, 3)) + ' and read the tangent slope', todo: 'The green dashed line is the tangent.', check: (W) => Math.abs(W.a - x0) < (o.snap || 0.05) / 2 + 1e-9, auto: (W) => (W.a = x0), reveal: (W) => (W.a = x0) }]),
       { k: 'num', q: 'Slope at x = ' + (o.x0s || fmtN(x0, 3)) + ' = ? (2 decimals are enough)', a: df(x0), tol: Math.max(0.011, Math.abs(df(x0)) * 0.003), show: o.show || fmtN(df(x0), 3), act: async (W) => { W.a = x0; }, x: 'From the formula: ' + fmtN(df(x0), 4) + '.' }, ...(o.post || [])],
@@ -95,7 +95,7 @@ function dQ(ex, n, q, f, df, opts, x0, o = {}) {
 function d2Q(ex, n, q, f, d2f, opts, x0, o = {}) {
   const v = o.view || [x0 - 2.5, x0 + 2.5];
   return { ex, n, q, scene: 'calc', f, d2f, x0,
-    setup: (W) => { calcView(W, f, v[0], v[1], { y: o.y }); W.extraF = [{ f: (x) => ND(f, x), col: C.beni, dash: [7, 5] }]; W.a = x0; W.tan = true; W.read = true; grabCalc(W); W.pl.caption = 'solid: y · dashed: dy/dx'; },
+    setup: (W) => { calcView(W, f, v[0], v[1], { y: o.y, fit: true }); W.extraF = [{ f: (x) => ND(f, x) / (W.ys || 1), col: C.beni, dash: [7, 5] }]; W.a = x0; W.tan = true; W.read = true; grabCalc(W); W.pl.caption = 'solid: y · dashed: dy/dx'; },
     parts: [...(o.steps || []), { k: 'mcq', q: o.mq || 'd²y/dx² = ?', o: opts, a: 0, x: o.x || plain(opts[0]) + '.' }, { k: 'num', q: 'd²y/dx² at x = ' + (o.x0s || fmtN(x0, 3)) + ' = ? (2 decimals)', a: d2f(x0), tol: Math.max(0.011, Math.abs(d2f(x0)) * 0.003), show: fmtN(d2f(x0), 3), x: '= ' + fmtN(d2f(x0), 4) + ' (the slope of the dashed curve there).' }, ...(o.post || [])],
     w: [o.w || 'd²y/dx² = ' + plain(opts[0])] };
 }
