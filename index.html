@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kiso Maths Class 11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@800&family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="shared/kiso.css">
+<style>
+  .hub { height: 100vh; height: 100dvh; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); gap: 10px; }
+  .chs { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 10px; }
+  .ch { display: grid; grid-template-rows: minmax(0, 1fr) auto; text-decoration: none; color: var(--ink); background: var(--panel); border: 2px solid var(--ink); outline: 2px solid var(--page-ink); padding: 8px; min-height: 0; overflow: hidden; transition: transform .12s; }
+  .ch:hover { transform: translateY(-3px) rotate(-.5deg); background: var(--paper); }
+  .ch:active { transform: translate(2px, 2px); }
+  .ch .pic { position: relative; min-height: 0; border: 2px solid var(--ink); overflow: hidden; display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 26px 6px 0 10px; }
+  .ch .pic .big { font: 800 clamp(18px, 3.4vw, 42px)/1.05 var(--font-display); letter-spacing: -0.03em; color: var(--ink); text-align: left; min-width: 0; overflow-wrap: anywhere; }
+  .ch .pic img { flex: none; align-self: flex-end; height: 92%; max-width: 46%; object-fit: contain; }
+  .ch .pic .n { position: absolute; left: 0; top: 0; background: var(--ink); color: var(--panel); font: 800 16px/1 var(--font-display); padding: 5px 8px; }
+  .ch .k { font: 700 11px/14px var(--font-sans); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-muted); margin-top: 6px; }
+  .ch b { display: block; font: 800 clamp(15px, 2.2vw, 22px)/1.05 var(--font-display); letter-spacing: -0.02em; }
+  .ch .bar2 { height: 8px; border: 2px solid var(--ink); margin-top: 6px; position: relative; background: var(--paper); }
+  .ch .bar2 i { position: absolute; inset: 0; background: var(--beni); transform-origin: left; }
+  .how { background: var(--panel); color: var(--ink); border: 2px solid var(--ink); outline: 2px solid var(--page-ink); padding: 10px; display: grid; gap: 6px; align-content: center; }
+  .how b { font: 800 18px/1.1 var(--font-display); }
+  .how ul { margin: 0; padding-left: 18px; font: 600 13px/18px var(--font-sans); }
+  @media (max-width: 700px) { .chs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .how ul li:nth-child(n+3) { display: none; } .ch .pic img { height: 80%; } }
+</style>
+</head>
+<body>
+<div class="hub">
+  <header class="mhead">
+    <div>
+      <div class="eyebrow">Kiso · NCERT Class 11 Mathematics</div>
+      <h1>Learn it by <em>playing</em> it.</h1>
+      <p>Five chapters with Jeevesh and Kimmy. Every concept is a simulation and every textbook question is a tactile sim with speed points.</p>
+    </div>
+    <div class="art" aria-hidden="true"><div><img src="m/jess-body.png" alt="" width="29" height="76"></div><div><img src="m/kimmy-sit.png" alt="" width="61" height="76"></div></div>
+  </header>
+  <div class="mtools"><span class="prog" id="tot"></span><span class="xp" id="xp"></span><button class="pill snd" type="button" id="snd">🔇 Sound</button></div>
+  <nav class="chs" id="chs" aria-label="Chapters"></nav>
+</div>
+<script>
+const CHS = [
+  { n: 1, t: 'Sets', big: '{ A ∪ B }', img: 'kimmy-curious', k: 'Venn · subsets · intervals' },
+  { n: 2, t: 'Relations & Functions', big: 'f : A → B', img: 'kimmy-playful', k: 'Grids · arrows · graphs' },
+  { n: 3, t: 'Trigonometric Functions', big: 'sin²x + cos²x', img: 'kimmy-lookup', k: 'Unit circle · identities' },
+  { n: 4, t: 'Complex Numbers', big: 'i² = −1', img: 'kimmy-surprised', k: 'Argand plane · rotations' },
+  { n: 5, t: 'Linear Inequalities', big: 'x < 3', img: 'kimmy-excited', k: 'Balance · number line' },
+];
+const BG = ['--sakura', '--sora-tint', '--peach', '--matcha-tint', '--kin-tint'];
+const get = (k, d) => { try { const v = localStorage.getItem('kisoM:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
+const set = (k, v) => { try { localStorage.setItem('kisoM:' + k, JSON.stringify(v)); } catch (e) { } };
+const prog = get('chapters', {}); let pts = 0, cleared = 0;
+const box = document.getElementById('chs');
+CHS.forEach((c, i) => {
+  const p = prog[c.n] || {}; pts += p.pts || 0; if (p.total && p.done >= p.total) cleared++;
+  const a = document.createElement('a'); a.className = 'ch'; a.href = 'ch' + c.n + '.html';
+  a.innerHTML = `<div class="pic" style="background:var(${BG[i]})"><span class="n">CH ${c.n}</span><div class="big">${c.big}</div><img src="m/${c.img}.png" alt=""></div>
+    <div><div class="k">${c.k}${p.total ? ' · ' + p.done + '/' + p.total : ''}</div><b>${c.t}</b><div class="bar2"><i style="transform:scaleX(${p.total ? p.done / p.total : 0})"></i></div></div>`;
+  box.append(a);
+});
+const how = document.createElement('div'); how.className = 'how';
+how.innerHTML = '<b>How it works</b><ul><li>Lessons: predict, play the sim, discover the rule.</li><li>Exercises: every NCERT question, broken into small steps.</li><li>Speed points, streaks and combo bursts like Kahoot.</li><li>Tap the progress bar to jump to any question.</li></ul>';
+box.append(how);
+document.getElementById('tot').textContent = cleared + ' of 5 chapters cleared';
+document.getElementById('xp').textContent = pts ? '★ ' + pts.toLocaleString() + ' pts' : '';
+const sb = document.getElementById('snd'); let muted = get('muted', true);
+const paint = () => { sb.textContent = muted ? '🔇 Sound' : '🔊 Sound'; sb.setAttribute('aria-pressed', !muted); };
+paint(); sb.onclick = () => { muted = !muted; set('muted', muted); paint(); };
+</script>
+</body>
+</html>
