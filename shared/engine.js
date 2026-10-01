@@ -311,7 +311,10 @@ async function kahoot(q, opts, correct, time = 20) {
   const g = GEN; const qEl = H('p', 'q', q); const tm = timerEl(time); const short = opts.every((o) => plain(o).length < 14);
   const tiles = h('div', { class: 'tiles' + (opts.length === 2 ? ' tf' : '') + (short ? ' short' : '') }); const kq = h('div', { class: 'kq' }, qEl, tm.el, tiles); sheet.append(kq);
   gsap.from(qEl, { y: -14, opacity: 0, duration: 0.3 }); SFX.whoosh();
-  let pick = null; const els = opts.map((t, i) => { const b = h('button', { class: 'tile', type: 'button', html: (opts.length === 2 ? '' : SHAPES[i]) }); b.append(h('span', { html: fm(t) })); b.onclick = () => { if (pick == null) { pick = i; SFX.click(); buzz(12); } }; tiles.append(b); return b; });
+  // display order is shuffled (3+ options) so the right answer is never in a predictable place; els stay indexed by the original option
+  const order = opts.map((_, i) => i); if (opts.length > 2) for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+  let pick = null; const els = opts.map((t, i) => { const b = h('button', { class: 'tile', type: 'button' }); b.append(h('span', { html: fm(t) })); b.onclick = () => { if (pick == null) { pick = i; SFX.click(); buzz(12); } }; return b; });
+  order.forEach((i, k) => { if (opts.length !== 2) els[i].insertAdjacentHTML('afterbegin', SHAPES[k] || ''); tiles.append(els[i]); });
   gsap.from(els, { scale: 0.5, opacity: 0, rotate: () => gsap.utils.random(-8, 8), duration: 0.4, stagger: 0.07, ease: 'back.out(2.2)' });
   const t0 = T; const rt = runTimer(tm, time, t0, true);
   if (AUTO) setTimeout(() => { pick = autoPickWrong() ? (correct + 1) % opts.length : correct; }, 20);
