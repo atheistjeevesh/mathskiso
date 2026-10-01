@@ -1,6 +1,6 @@
 # Kiso Maths · Class 11
 
-Interactive, simulation-first lessons for NCERT Class 11 Mathematics, Chapters 1–14, in the Kiso style (Jeevesh and Kimmy, manga panels, Kahoot-style speed rounds).
+Interactive, simulation-first lessons for NCERT Class 11 Mathematics, Chapters 1–14, plus Class 12 Part 1, in the Kiso style (Jeevesh and Kimmy, manga panels, Kahoot-style speed rounds).
 
 Open `index.html` in a browser (any static server works, for example `python3 -m http.server`).
 
@@ -20,6 +20,7 @@ Open `index.html` in a browser (any static server works, for example `python3 -m
 | `ch12.html` | Limits & Derivatives | points sliding in from both sides, holes and jumps, a secant collapsing into the tangent, unit-circle sandwich for sin x / x |
 | `ch13.html` | Statistics | draggable dot plot (mean as balance point, deviations as bars or real squares), frequency bars and histograms with mean/median lines |
 | `ch14.html` | Probability | tap-to-build events on the 36 two-dice outcomes, 52-card deck, die/coin roller with settling frequencies, probability Venn |
+| `c12ch1.html` | Class 12 · Relations & Functions | tap pairs on A × A with live reflexive/symmetric/transitive badges and counter-examples, equivalence-class sorter, horizontal-line test for one-one/onto, composition arrows |
 
 Every in-text example and every exercise question (including Miscellaneous) is implemented, split into small steps where needed.
 

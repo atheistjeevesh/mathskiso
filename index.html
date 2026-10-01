@@ -53,9 +53,9 @@
 <div class="hub">
   <header class="mhead">
     <div>
-      <div class="eyebrow">Kiso · NCERT Class 11 Mathematics</div>
+      <div class="eyebrow">Kiso · NCERT Class 11 &amp; 12 Mathematics</div>
       <h1>Learn it by <em>playing</em> it.</h1>
-      <p>Fourteen chapters with Jeevesh and Kimmy. Every concept is a simulation and every textbook question is a tactile sim with speed points.</p>
+      <p>All of Class 11 and Class 12 Part 1 with Jeevesh and Kimmy. Every concept is a simulation and every textbook question is a tactile sim with speed points.</p>
     </div>
     <div class="art" aria-hidden="true"><div><img src="m/jess-body.png" alt="" width="29" height="76"></div><div><img src="m/kimmy-sit.png" alt="" width="61" height="76"></div></div>
   </header>
@@ -78,23 +78,24 @@ const CHS = [
   { n: 12, t: 'Limits & Derivatives', s: 'Limits & Derivatives', big: 'lim f(x)', img: 'jess-thinking', k: 'Secants · tangents' },
   { n: 13, t: 'Statistics', big: 'x̄ ± σ', img: 'kimmy-content', k: 'Dot plots · spread' },
   { n: 14, t: 'Probability', big: 'P(A ∪ B)', img: 'jess-happy', k: 'Dice grid · Venn · decks' },
+  { n: '12-1', file: 'c12ch1', b: 'XII · 1', t: 'Relations & Functions', big: 'R, S, T', img: 'kimmy-surprised', k: 'Class 12 · bijections' },
 ];
-const BG = ['--sakura', '--sora-tint', '--peach', '--matcha-tint', '--kin-tint', '--sora-tint', '--peach', '--matcha-tint', '--sakura', '--kin-tint', '--matcha-tint', '--sakura', '--sora-tint', '--peach'];
+const BG = ['--sakura', '--sora-tint', '--peach', '--matcha-tint', '--kin-tint', '--sora-tint', '--peach', '--matcha-tint', '--sakura', '--kin-tint', '--matcha-tint', '--sakura', '--sora-tint', '--peach', '--kin-tint'];
 const get = (k, d) => { try { const v = localStorage.getItem('kisoM:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
 const set = (k, v) => { try { localStorage.setItem('kisoM:' + k, JSON.stringify(v)); } catch (e) { } };
 const prog = get('chapters', {}); let pts = 0, cleared = 0;
 const box = document.getElementById('chs');
 CHS.forEach((c, i) => {
   const p = prog[c.n] || {}; pts += p.pts || 0; if (p.total && p.done >= p.total) cleared++;
-  const a = document.createElement('a'); a.className = 'ch'; a.href = 'ch' + c.n + '.html';
+  const a = document.createElement('a'); a.className = 'ch'; a.href = (c.file || 'ch' + c.n) + '.html';
   a.style.setProperty('--bg', `var(${BG[i]})`);
-  a.innerHTML = `<div class="pic" style="background:var(${BG[i]})"><span class="n">CH ${c.n}</span><div class="big">${c.big}</div><img src="m/${c.img}.png" alt=""></div>
-    <div><div class="k">${c.k}${p.total ? ' · ' + p.done + '/' + p.total : ''}</div><b><span class="cn">CH ${c.n}</span><span class="f">${c.t}</span><span class="s">${c.s || c.t}</span></b><div class="bar2"><i style="transform:scaleX(${p.total ? p.done / p.total : 0})"></i></div></div>`;
+  a.innerHTML = `<div class="pic" style="background:var(${BG[i]})"><span class="n">${c.b || 'CH ' + c.n}</span><div class="big">${c.big}</div><img src="m/${c.img}.png" alt=""></div>
+    <div><div class="k">${c.k}${p.total ? ' · ' + p.done + '/' + p.total : ''}</div><b><span class="cn">${c.b || 'CH ' + c.n}</span><span class="f">${c.t}</span><span class="s">${c.s || c.t}</span></b><div class="bar2"><i style="transform:scaleX(${p.total ? p.done / p.total : 0})"></i></div></div>`;
   box.append(a);
 });
 const how = document.createElement('div'); how.className = 'how';
 how.innerHTML = '<b>How it works</b><ul><li>Lessons: predict, play the sim, discover the rule.</li><li>Exercises: every NCERT question, broken into small steps.</li><li>Speed points, streaks and combo bursts like Kahoot.</li><li>Tap the progress bar to jump to any question.</li></ul>';
-box.append(how);
+
 document.getElementById('tot').textContent = cleared + ' of ' + CHS.length + ' chapters cleared';
 document.getElementById('xp').textContent = pts ? '★ ' + pts.toLocaleString() + ' pts' : '';
 const sb = document.getElementById('snd'); let muted = get('muted', true);
