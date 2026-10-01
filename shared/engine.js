@@ -359,7 +359,7 @@ async function fields(q, specs, { time = 60, keys = '' } = {}) {
   addEventListener('keydown', onKey, true);
   const t0 = T; const rt = runTimer(tm, time, t0, false);
   const check = () => specs.map((s, i) => { const u = evalExpr(vals[i]), a = evalExpr(s.a); const tol = s.tol != null ? s.tol : 1e-6 * Math.max(1, Math.abs(a)); return isFinite(u) && Math.abs(u - a) <= tol; });
-  if (AUTO) setTimeout(() => { specs.forEach((s, i) => (vals[i] = autoPickWrong() ? '0' : String(s.show || s.a).replace(/−/g, '-'))); paint(); sub = true; }, 20);
+  if (AUTO) setTimeout(() => { specs.forEach((s, i) => (vals[i] = autoPickWrong() ? '0' : (() => { const t = String(s.show || s.a).replace(/−/g, '-'); return Math.abs(evalExpr(t) - evalExpr(s.a)) <= (s.tol != null ? s.tol : 1e-6 * Math.max(1, Math.abs(evalExpr(s.a)))) ? t : String(evalExpr(s.a)); })())); paint(); sub = true; }, 20);
   while (!done) {
     await waitFor(() => { rt.step(); return sub; }); guard(g); sub = false;
     const res = check(); if (vals.some((v) => !v)) { FX.wob(box.querySelector('.fields')); continue; } tries++;

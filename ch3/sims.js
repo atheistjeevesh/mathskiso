@@ -158,7 +158,7 @@ function proofQ(ex, n, q, Lf, Rf, key, steps, o = {}) {
     ex, n, q, idL: Lf, idR: Rf, idO: o, scene: 'plane', setup: (W) => idSetup(W, Lf, Rf, o),
     parts: [
       { k: 'run', run: async () => { await idAnimate(W); } },
-      { k: 'task', q: 'Graph check: the two curves sit on top of each other. Slide x and compare the numbers.', todo: 'Drag the slider through at least 3 places.', pre: () => { let n2 = 0, lv = null; slider('x', W.pl.x0 + 0.05, W.pl.x1 - 0.05, 0.05, W.ix, (v) => fmtN(v, 2), (v) => { W.ix = v; if (lv != null && Math.abs(v - lv) > 0.3) { n2++; lv = v; } if (lv == null) lv = v; W.slid = n2; }, W.pl.x0 + 0.5); }, check: (W) => (W.slid || 0) >= 2, auto: (W) => (W.slid = 3), x: 'LHS = RHS at every x: it IS an identity. Now prove it.', hint: 'Slide the x slider a few times.' },
+      { k: 'task', q: 'Graph check: the two curves sit on top of each other. Slide x and compare the numbers.', todo: 'Drag the slider through at least 3 places.', pre: () => { let n2 = 0, lv = null; slider('x', W.pl.x0 + 0.05, W.pl.x1 - 0.05, 0.05, W.ix, (v) => fmtN(v, 2), (v) => { W.ix = v; if (lv != null && Math.abs(v - lv) > 0.3) { n2++; lv = v; } if (lv == null) lv = v; W.slid = Math.max(W.slid || 0, n2); }, W.pl.x0 + 0.5); }, check: (W) => (W.slid || 0) >= 2, auto: (W) => (W.slid = 3), x: 'LHS = RHS at every x: it IS an identity. Now prove it.', hint: 'Slide the x slider a few times.' },
       Object.assign({ k: 'mcq', time: 30 }, key),
       { k: 'order', q: 'Build the proof: tap the steps in order', s: steps, x: 'Proved.' },
     ],
