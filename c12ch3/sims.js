@@ -22,7 +22,7 @@ function cell(v) {
   if (typeof v === 'string') return v;
   if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v)).replace('-', '−');
   for (const [s, t] of SURDS) { if (Math.abs(Math.abs(v) - s) < 1e-9) return (v < 0 ? '−' : '') + t; }
-  const f = fracStr(v, 60); if (Math.abs(evalExpr(f.replace('−', '-')) - v) < 1e-9) return f;
+  const f = fracStr(v, 300); if (Math.abs(evalExpr(f.replace('−', '-')) - v) < 1e-9) return f;
   return fmtN(v, 3);
 }
 const mStr = (A) => '[' + A.map((r) => r.map(cell).join(', ')).join('; ') + ']';
@@ -60,13 +60,18 @@ MINI.mat = {
       M.forEach((r, i) => r.forEach((v, j) => {
         let cx = x0 + L.cw.slice(0, j).reduce((p, q) => p + q, 0), cyy = top + i * L.rh; const key = i + ',' + j;
         let fill = null; if (hl.r && hl.r.has(i)) fill = C['sora-tint']; if (hl.c && hl.c.has(j)) fill = hl.r && hl.r.has(i) ? C['kin-tint'] : C.sakura; if (hl.cells && hl.cells.has(key)) fill = C.kin; if (it.tone && it.tone(i, j)) fill = it.tone(i, j);
+        if (!fill && it.signs) { ctx.save(); ctx.globalAlpha = 0.55; ctx.fillStyle = (i + j) % 2 ? C.sakura : C['matcha-tint']; ctx.fillRect(cx + 1, cyy + 2, L.cw[j] - 2, L.rh - 4); ctx.restore(); }
         if (fill) { ctx.fillStyle = fill; ctx.fillRect(cx + 1, cyy + 2, L.cw[j] - 2, L.rh - 4); }
         const hid = it.hide === 'all' || (it.hide && it.hide.has && it.hide.has(key));
         const t = hid ? '?' : cell(v); D.text(t, cx + L.cw[j] / 2, cyy + L.rh * 0.64, { size: fs, w: 800, disp: true, col: hid ? C['ink-muted'] : it.col || C.ink });
         W._cells.push({ it, i, j, x: cx0 + (cx) * s, y: cy + cyy * s, w: L.cw[j] * s, h: L.rh * s });
       }));
-      // brackets
+      // crossed-out row/column (minors) and cofactor sign chips
+      if (it.cross) { ctx.save(); ctx.fillStyle = C.ink; ctx.globalAlpha = 0.16; const cw0 = L.cw.slice(0, it.cross.j).reduce((p, q) => p + q, 0); ctx.fillRect(x0, top + it.cross.i * L.rh + 2, L.cw.reduce((p, q) => p + q, 0), L.rh - 4); ctx.fillRect(x0 + cw0 + 1, top, L.cw[it.cross.j] - 2, L.h); ctx.restore(); ctx.strokeStyle = C.beni; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x0, top + (it.cross.i + 0.5) * L.rh); ctx.lineTo(x0 + L.cw.reduce((p, q) => p + q, 0), top + (it.cross.i + 0.5) * L.rh); ctx.moveTo(x0 + cw0 + L.cw[it.cross.j] / 2, top); ctx.lineTo(x0 + cw0 + L.cw[it.cross.j] / 2, top + L.h); ctx.stroke(); }
+      if (it.signs) D.text('green +  ·  pink −', x0 + L.cw.reduce((p, q) => p + q, 0) / 2, top + L.h + 16, { size: 11, w: 700, col: C['ink-muted'] });
+      // brackets (or determinant bars)
       ctx.strokeStyle = it.col || C.ink; ctx.lineWidth = 2.5; const bw = 7, xr = x0 + L.cw.reduce((p, q) => p + q, 0);
+      if (it.bars) { ctx.beginPath(); ctx.moveTo(x0 - 7, top); ctx.lineTo(x0 - 7, top + L.h); ctx.moveTo(xr + 5, top); ctx.lineTo(xr + 5, top + L.h); ctx.stroke(); if (it.sub) D.text(it.sub, xr + 8, top + L.h + 4, { size: 11, w: 700, align: 'left', col: C['ink-muted'] }); x += L.w + gap; ctx.globalAlpha = 1; return; }
       ctx.beginPath(); ctx.moveTo(x0 + bw - 9, top); ctx.lineTo(x0 - 9 + 2, top); ctx.lineTo(x0 - 9 + 2, top + L.h); ctx.lineTo(x0 + bw - 9, top + L.h); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(xr - bw + 7, top); ctx.lineTo(xr + 5, top); ctx.lineTo(xr + 5, top + L.h); ctx.lineTo(xr - bw + 7, top + L.h); ctx.stroke();
       if (it.sub) D.text(it.sub, xr + 8, top + L.h + 4, { size: 11, w: 700, align: 'left', col: C['ink-muted'] });
@@ -121,3 +126,39 @@ MINI.sq = {
 };
 const rotM = (t) => [[Math.cos(t), -Math.sin(t)], [Math.sin(t), Math.cos(t)]];
 async function sqTo(W, B, d = 1) { const from = W.A.map((r) => r.slice()); const o = { t: 0 }; SFX.whoosh(); await tw(o, { t: 1, duration: d, ease: 'power2.inOut', onUpdate: () => { W.A = from.map((r, i) => r.map((v, j) => lerp(v, B[i][j], o.t))); } }); W.A = B.map((r) => r.slice()); }
+
+/* ---------- question builders shared by the matrix chapters (3 and 4) ---------- */
+const rv = async (W) => { const i = W.items.length - 1; if (W.items[i].hide) await revealM(W, i, 0.03); };
+const cellAt = (W, iC, sx, sy) => (W._cells || []).find((c) => c.it === W.items[iC] && sx >= c.x && sx <= c.x + c.w && sy >= c.y && sy <= c.y + c.h);
+/* light the matching cells of every matrix on stage and show a trace */
+function lightSame(W, i, j, text) { W.items.forEach((it) => { if (it.M && it.M[i] && it.M[i][j] !== undefined) it.hl = { cells: new Set([i + ',' + j]) }; }); W.trace = text; }
+/* generic "fill the hidden matrix" question.
+   items: stage items (strings are operators); res: index of the hidden answer.
+   o.mul: result = items[res-4] × items[res-2] (row × column traces). o.trace(i,j): text for a tapped cell.
+   Rows in o.ask are typed; the other cells are tapped open one by one. */
+function mq(ex, n, q, items, o = {}) {
+  const iC = o.res != null ? o.res : items.length - 1; const R = items[iC].M;
+  const all = R.flatMap((r, i) => r.map((_, j) => [i, j]));
+  const ask = o.ask || (all.length <= 6 ? R.map((_, i) => i) : [0]);
+  const rest = all.filter(([i]) => !ask.includes(i)).map(([i, j]) => i + ',' + j);
+  const show = (W, i, j) => { if (o.mul) lightIJ(W, iC - 4, iC - 2, iC, i, j); else lightSame(W, i, j, o.trace ? o.trace(i, j) : ''); };
+  const open = (W, k) => { W.items[iC].hide.delete(k); W.seen.add(k); };
+  const tapPart = rest.length ? [{ k: 'task', q: o.tq || 'Tap every ? cell outside ' + (ask.length === 1 ? 'row ' + (ask[0] + 1) : 'the typed rows') + ' to work it out', todo: 'Tap the cells on the stage, then lock in.', pre: async (W) => { W.seen = new Set(); W.onTap = (x, y, sx, sy) => { const c = cellAt(W, iC, sx, sy); if (!c || ask.includes(c.i)) return; show(W, c.i, c.j); open(W, c.i + ',' + c.j); SFX.snap(); buzz(8); }; }, check: (W) => rest.every((k) => W.seen.has(k)), auto: (W) => rest.forEach((k) => open(W, k)), reveal: (W) => rest.forEach((k) => open(W, k)), x: 'Each cell is its own small sum.' }] : [];
+  const nm = o.nm || (items[iC].name ? items[iC].name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 1) || 'c' : 'c');
+  return {
+    ex, n, q, scene: 'mat', kim: o.kim,
+    setup: (W) => { const its = matSet(W, items.map((it) => (typeof it === 'string' ? it : { ...it })), { fs: o.fs, cap: o.cap }); its[iC].hide = hideAll(R); },
+    parts: [...(o.pre || []), ...tapPart,
+      { k: 'fields', q: o.fq || (rest.length ? 'Now type row ' + ask.map((i) => i + 1).join(' and ') : 'Fill in the answer'), f: mFields(R, nm, ask), keys: o.keys, pre: async (W) => { W.onTap = null; }, x: o.x || '= ' + mStr(R) + '.', act: async (W) => { if (o.mul && !AUTO) await sweepMul(W, iC - 4, iC - 2, iC, all.length > 6 ? 0.08 : 0.3); else await revealM(W, iC, 0.04); } },
+      ...(o.post || [])],
+    w: o.w || [q + ': ' + mStr(R)],
+  };
+}
+const pm = (A, B, nA = 'A', nB = 'B', o = {}) => [{ M: A, name: nA }, '×', { M: B, name: nB }, '=', { M: MM.mul(A, B), name: o.nR || '', hide: 'all' }];
+const sumItems = (A, op, B, R, nA = 'A', nB = 'B') => [{ M: A, name: nA }, op, { M: B, name: nB }, '=', { M: R }];
+const opTrace = (A, B, op, kA = 1, kB = 1) => (i, j) => (kA !== 1 ? kA + '·' : '') + cell(A[i][j]) + ' ' + op + ' ' + (kB !== 1 ? kB + '·' : '') + (B[i][j] < 0 ? '(' + cell(B[i][j]) + ')' : cell(B[i][j])) + ' = ' + cell(op === '+' ? kA * A[i][j] + kB * B[i][j] : kA * A[i][j] - kB * B[i][j]);
+const showM = (...items) => ({ k: 'run', run: async (W) => { matSet(W, items.map((it) => (typeof it === 'string' ? it : { ...it })), {}); SFX.flip(); await wait(AUTO ? 0.05 : 0.4); } });
+const boardQ = (ex, n, q, parts, w, o = {}) => ({ ex, n, q, scene: o.scene || 'board', setup: o.setup, kim: o.kim, parts, w: [w] });
+const mcq = (q, o, x) => ({ k: 'mcq', q, o, a: 0, x });
+/* a stage with given matrices and some quick parts */
+const stageQ = (ex, n, q, items, parts, w, o = {}) => ({ ex, n, q, scene: 'mat', kim: o.kim, setup: (W) => matSet(W, items.map((it) => (typeof it === 'string' ? it : { ...it })), { fs: o.fs, cap: o.cap }), parts, w: [w] });

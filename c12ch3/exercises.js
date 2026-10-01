@@ -3,40 +3,6 @@
    Every matrix answer is computed with MM (add, sub, k, mul, T) — nothing typed by hand.
    ========================================================= */
 const r3 = Math.sqrt(3), PI3 = Math.PI / 3;
-const rv = async (W) => { const i = W.items.length - 1; if (W.items[i].hide) await revealM(W, i, 0.03); };
-const cellAt = (W, iC, sx, sy) => (W._cells || []).find((c) => c.it === W.items[iC] && sx >= c.x && sx <= c.x + c.w && sy >= c.y && sy <= c.y + c.h);
-/* light the matching cells of every matrix on stage and show a trace */
-function lightSame(W, i, j, text) { W.items.forEach((it) => { if (it.M && it.M[i] && it.M[i][j] !== undefined) it.hl = { cells: new Set([i + ',' + j]) }; }); W.trace = text; }
-/* generic "fill the hidden matrix" question.
-   items: stage items (strings are operators); res: index of the hidden answer.
-   o.mul: result = items[res-4] × items[res-2] (row × column traces). o.trace(i,j): text for a tapped cell.
-   Rows in o.ask are typed; the other cells are tapped open one by one. */
-function mq(ex, n, q, items, o = {}) {
-  const iC = o.res != null ? o.res : items.length - 1; const R = items[iC].M;
-  const all = R.flatMap((r, i) => r.map((_, j) => [i, j]));
-  const ask = o.ask || (all.length <= 6 ? R.map((_, i) => i) : [0]);
-  const rest = all.filter(([i]) => !ask.includes(i)).map(([i, j]) => i + ',' + j);
-  const show = (W, i, j) => { if (o.mul) lightIJ(W, iC - 4, iC - 2, iC, i, j); else lightSame(W, i, j, o.trace ? o.trace(i, j) : ''); };
-  const open = (W, k) => { W.items[iC].hide.delete(k); W.seen.add(k); };
-  const tapPart = rest.length ? [{ k: 'task', q: o.tq || 'Tap every ? cell outside ' + (ask.length === 1 ? 'row ' + (ask[0] + 1) : 'the typed rows') + ' to work it out', todo: 'Tap the cells on the stage, then lock in.', pre: async (W) => { W.seen = new Set(); W.onTap = (x, y, sx, sy) => { const c = cellAt(W, iC, sx, sy); if (!c || ask.includes(c.i)) return; show(W, c.i, c.j); open(W, c.i + ',' + c.j); SFX.snap(); buzz(8); }; }, check: (W) => rest.every((k) => W.seen.has(k)), auto: (W) => rest.forEach((k) => open(W, k)), reveal: (W) => rest.forEach((k) => open(W, k)), x: 'Each cell is its own small sum.' }] : [];
-  const nm = o.nm || (items[iC].name ? items[iC].name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 1) || 'c' : 'c');
-  return {
-    ex, n, q, scene: 'mat', kim: o.kim,
-    setup: (W) => { const its = matSet(W, items.map((it) => (typeof it === 'string' ? it : { ...it })), { fs: o.fs, cap: o.cap }); its[iC].hide = hideAll(R); },
-    parts: [...(o.pre || []), ...tapPart,
-      { k: 'fields', q: o.fq || (rest.length ? 'Now type row ' + ask.map((i) => i + 1).join(' and ') : 'Fill in the answer'), f: mFields(R, nm, ask), keys: o.keys, pre: async (W) => { W.onTap = null; }, x: o.x || '= ' + mStr(R) + '.', act: async (W) => { if (o.mul && !AUTO) await sweepMul(W, iC - 4, iC - 2, iC, all.length > 6 ? 0.08 : 0.3); else await revealM(W, iC, 0.04); } },
-      ...(o.post || [])],
-    w: o.w || [q + ': ' + mStr(R)],
-  };
-}
-const pm = (A, B, nA = 'A', nB = 'B', o = {}) => [{ M: A, name: nA }, '×', { M: B, name: nB }, '=', { M: MM.mul(A, B), name: o.nR || '', hide: 'all' }];
-const sumItems = (A, op, B, R, nA = 'A', nB = 'B') => [{ M: A, name: nA }, op, { M: B, name: nB }, '=', { M: R }];
-const opTrace = (A, B, op, kA = 1, kB = 1) => (i, j) => (kA !== 1 ? kA + '·' : '') + cell(A[i][j]) + ' ' + op + ' ' + (kB !== 1 ? kB + '·' : '') + (B[i][j] < 0 ? '(' + cell(B[i][j]) + ')' : cell(B[i][j])) + ' = ' + cell(op === '+' ? kA * A[i][j] + kB * B[i][j] : kA * A[i][j] - kB * B[i][j]);
-const showM = (...items) => ({ k: 'run', run: async (W) => { matSet(W, items.map((it) => (typeof it === 'string' ? it : { ...it })), {}); SFX.flip(); await wait(AUTO ? 0.05 : 0.4); } });
-const boardQ = (ex, n, q, parts, w, o = {}) => ({ ex, n, q, scene: o.scene || 'board', setup: o.setup, kim: o.kim, parts, w: [w] });
-const mcq = (q, o, x) => ({ k: 'mcq', q, o, a: 0, x });
-/* a stage with given matrices and some quick parts */
-const stageQ = (ex, n, q, items, parts, w, o = {}) => ({ ex, n, q, scene: 'mat', kim: o.kim, setup: (W) => matSet(W, items.map((it) => (typeof it === 'string' ? it : { ...it })), { fs: o.fs, cap: o.cap }), parts, w: [w] });
 const orders = (N) => { const r = []; for (let m = 1; m <= N; m++) if (N % m === 0) r.push(m + ' × ' + N / m); return r; };
 
 /* ===================== EXERCISE 3.1 ===================== */
