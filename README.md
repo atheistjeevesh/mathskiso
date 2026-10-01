@@ -1,6 +1,6 @@
 # Kiso Maths · Class 11
 
-Interactive, simulation-first lessons for NCERT Class 11 Mathematics, Chapters 1–14, plus Class 12 Part 1 (Chapters 1–6), in the Kiso style (Jeevesh and Kimmy, manga panels, Kahoot-style speed rounds).
+Interactive, simulation-first lessons for NCERT Class 11 Mathematics, Chapters 1–14, plus Class 12 Parts 1 and 2 (Chapters 1–11), in the Kiso style (Jeevesh and Kimmy, manga panels, Kahoot-style speed rounds).
 
 Open `index.html` in a browser (any static server works, for example `python3 -m http.server`).
 
@@ -26,6 +26,11 @@ Open `index.html` in a browser (any static server works, for example `python3 -m
 | `c12ch4.html` | Class 12 · Determinants | determinant as area, tap-to-expand minors and cofactors on a sign checkerboard, draggable triangle area, consistency as crossing/parallel lines |
 | `c12ch5.html` | Class 12 · Continuity & Differentiability | a pen that lifts at every break, k-sliders that join graphs, kink secants, drag along implicit curves, parametric tangents, live second-derivative checks |
 | `c12ch6.html` | Class 12 · Application of Derivatives | living related-rate pictures (ripples, balloons, ladders, cone tanks, shadows), f′ sign strips, hill/valley markers, optimisation playgrounds |
+| `c12ch7.html` | Class 12 · Integrals | slide the constant C through a family of antiderivatives, Riemann rectangles that settle on the area, F rising by exactly the shaded area, partial-fraction sliders |
+| `c12ch8.html` | Class 12 · Application of Integrals | sweep a strip across the region, horizontal strips for x = g(y), one quadrant of a circle or ellipse mirrored ×4, signed pieces vs total area |
+| `c12ch9.html` | Class 12 · Differential Equations | derivative tower for order and degree, slope fields where a tap releases a solution curve and the textbook answer glows on top of it, residual meter for verification |
+| `c12ch10.html` | Class 12 · Vector Algebra | compass-snapping arrows, tip-to-tail sums, swing b⃗ until a⃗·b⃗ = 0 with a projection shadow, cross products standing up from their parallelograms in orbitable 3D |
+| `c12ch11.html` | Class 12 · Three Dimensional Geometry | riders sliding along r⃗ = a⃗ + λb⃗, angle arcs between lines, two-slider hunt for the shortest distance between skew lines |
 
 Every in-text example and every exercise question (including Miscellaneous) is implemented, split into small steps where needed.
 
