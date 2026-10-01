@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="shared/kiso.css">
 <style>
   .hub { height: 100vh; height: 100dvh; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); gap: 10px; }
-  .chs { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 10px; }
+  .chs { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); gap: 10px; }
   .ch { display: grid; grid-template-rows: minmax(0, 1fr) auto; text-decoration: none; color: var(--ink); background: var(--panel); border: 2px solid var(--ink); outline: 2px solid var(--page-ink); padding: 8px; min-height: 0; overflow: hidden; transition: transform .12s; }
   .ch:hover { transform: translateY(-3px) rotate(-.5deg); background: var(--paper); }
   .ch:active { transform: translate(2px, 2px); }
@@ -25,7 +25,26 @@
   .how { background: var(--panel); color: var(--ink); border: 2px solid var(--ink); outline: 2px solid var(--page-ink); padding: 10px; display: grid; gap: 6px; align-content: center; }
   .how b { font: 800 18px/1.1 var(--font-display); }
   .how ul { margin: 0; padding-left: 18px; font: 600 13px/18px var(--font-sans); }
-  @media (max-width: 700px) { .chs { grid-template-columns: repeat(2, minmax(0, 1fr)); } .how ul li:nth-child(n+3) { display: none; } .ch .pic img { height: 80%; } }
+  .how { grid-column: span 2; }
+  .ch .pic .big { font-size: clamp(16px, 2.1vw, 30px); white-space: nowrap; }
+  .ch { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+  .ch b { font-size: clamp(14px, 1.6vw, 20px); }
+  .ch b .s { display: none; }
+  @media (max-width: 700px) {
+    .chs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .ch { padding: 5px; grid-template-rows: minmax(0, 1fr) auto; }
+    .ch .pic { padding: 18px 4px 0 6px; }
+    .ch .pic .n { font-size: 12px; padding: 3px 6px; }
+    .ch .pic .big { font-size: clamp(12px, 3.8vw, 17px); }
+    .ch .pic img { height: 100%; max-width: 38%; }
+    .ch .k { display: none; }
+    .ch b { font-size: 13px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ch b .s { display: inline; } .ch b .f { display: none; }
+    .ch .bar2 { height: 6px; margin-top: 3px; }
+    .how { padding: 6px 8px; } .how b { font-size: 14px; } .how ul li:nth-child(n+3) { display: none; } .how ul { font-size: 12px; line-height: 15px; }
+    .mhead p { display: none; }
+  }
+  @media (max-height: 560px) { .how { display: none; } }
 </style>
 </head>
 <body>
@@ -34,7 +53,7 @@
     <div>
       <div class="eyebrow">Kiso · NCERT Class 11 Mathematics</div>
       <h1>Learn it by <em>playing</em> it.</h1>
-      <p>Five chapters with Jeevesh and Kimmy. Every concept is a simulation and every textbook question is a tactile sim with speed points.</p>
+      <p>Ten chapters with Jeevesh and Kimmy. Every concept is a simulation and every textbook question is a tactile sim with speed points.</p>
     </div>
     <div class="art" aria-hidden="true"><div><img src="m/jess-body.png" alt="" width="29" height="76"></div><div><img src="m/kimmy-sit.png" alt="" width="61" height="76"></div></div>
   </header>
@@ -44,12 +63,17 @@
 <script>
 const CHS = [
   { n: 1, t: 'Sets', big: '{ A ∪ B }', img: 'kimmy-curious', k: 'Venn · subsets · intervals' },
-  { n: 2, t: 'Relations & Functions', big: 'f : A → B', img: 'kimmy-playful', k: 'Grids · arrows · graphs' },
-  { n: 3, t: 'Trigonometric Functions', big: 'sin²x + cos²x', img: 'kimmy-lookup', k: 'Unit circle · identities' },
+  { n: 2, t: 'Relations & Functions', s: 'Relations & Funcs', big: 'f : A → B', img: 'kimmy-playful', k: 'Grids · arrows · graphs' },
+  { n: 3, t: 'Trigonometric Functions', s: 'Trig Functions', big: 'sin²x + cos²x', img: 'kimmy-lookup', k: 'Unit circle · identities' },
   { n: 4, t: 'Complex Numbers', big: 'i² = −1', img: 'kimmy-surprised', k: 'Argand plane · rotations' },
   { n: 5, t: 'Linear Inequalities', big: 'x < 3', img: 'kimmy-excited', k: 'Balance · number line' },
+  { n: 6, t: 'Permutations & Combinations', s: 'Perms & Combos', big: 'ⁿPᵣ · ⁿCᵣ', img: 'jess-thinking', k: 'Slots · trees · tiles' },
+  { n: 7, t: 'Binomial Theorem', big: '(a + b)ⁿ', img: 'kimmy-content', k: 'Pascal · expansions' },
+  { n: 8, t: 'Sequences & Series', big: 'a, ar, ar²', img: 'jess-happy', k: 'G.P. · sums · A.M. ≥ G.M.' },
+  { n: 9, t: 'Straight Lines', big: 'y = mx + c', img: 'kimmy-walk', k: 'Slopes · forms · distance' },
+  { n: 10, t: 'Conic Sections', big: 'x²/a² + y²/b²', img: 'jess-excited', k: 'Cone slicer · foci' },
 ];
-const BG = ['--sakura', '--sora-tint', '--peach', '--matcha-tint', '--kin-tint'];
+const BG = ['--sakura', '--sora-tint', '--peach', '--matcha-tint', '--kin-tint', '--sora-tint', '--peach', '--matcha-tint', '--sakura', '--kin-tint'];
 const get = (k, d) => { try { const v = localStorage.getItem('kisoM:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
 const set = (k, v) => { try { localStorage.setItem('kisoM:' + k, JSON.stringify(v)); } catch (e) { } };
 const prog = get('chapters', {}); let pts = 0, cleared = 0;
@@ -58,13 +82,13 @@ CHS.forEach((c, i) => {
   const p = prog[c.n] || {}; pts += p.pts || 0; if (p.total && p.done >= p.total) cleared++;
   const a = document.createElement('a'); a.className = 'ch'; a.href = 'ch' + c.n + '.html';
   a.innerHTML = `<div class="pic" style="background:var(${BG[i]})"><span class="n">CH ${c.n}</span><div class="big">${c.big}</div><img src="m/${c.img}.png" alt=""></div>
-    <div><div class="k">${c.k}${p.total ? ' · ' + p.done + '/' + p.total : ''}</div><b>${c.t}</b><div class="bar2"><i style="transform:scaleX(${p.total ? p.done / p.total : 0})"></i></div></div>`;
+    <div><div class="k">${c.k}${p.total ? ' · ' + p.done + '/' + p.total : ''}</div><b><span class="f">${c.t}</span><span class="s">${c.s || c.t}</span></b><div class="bar2"><i style="transform:scaleX(${p.total ? p.done / p.total : 0})"></i></div></div>`;
   box.append(a);
 });
 const how = document.createElement('div'); how.className = 'how';
 how.innerHTML = '<b>How it works</b><ul><li>Lessons: predict, play the sim, discover the rule.</li><li>Exercises: every NCERT question, broken into small steps.</li><li>Speed points, streaks and combo bursts like Kahoot.</li><li>Tap the progress bar to jump to any question.</li></ul>';
 box.append(how);
-document.getElementById('tot').textContent = cleared + ' of 5 chapters cleared';
+document.getElementById('tot').textContent = cleared + ' of ' + CHS.length + ' chapters cleared';
 document.getElementById('xp').textContent = pts ? '★ ' + pts.toLocaleString() + ' pts' : '';
 const sb = document.getElementById('snd'); let muted = get('muted', true);
 const paint = () => { sb.textContent = muted ? '🔇 Sound' : '🔊 Sound'; sb.setAttribute('aria-pressed', !muted); };
