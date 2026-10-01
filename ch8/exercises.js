@@ -6,7 +6,7 @@ const sub = (i) => 'a' + subN(i);
 /* first five terms from a rule f(n) (or a recursive list): fill five boxes, bars rise */
 function fiveQ(ex, n0, q, top, vals, o = {}) {
   return { ex, n: n0, q, scene: 'seq', setup: (W) => { W.top = top; seqSet(W, vals); if (o.ratio) { W.ratio = true; W.rtext = o.ratio; } }, kim: o.kim,
-    parts: [{ k: 'fields', q: o.ask || 'First five terms', f: vals.map((v, i) => ({ l: o.labs ? o.labs[i] : sub(i + 1), a: v, show: fmtV(v) })), x: vals.map(fmtV).join(', ') + '.', act: async () => seqGrow(W) }, ...(o.more || [])],
+    parts: [{ k: 'fields', q: o.ask || 'First five terms', f: vals.map((v, i) => ({ l: o.labs ? o.labs[i] : sub(i + 1), a: v, show: fmtV(v).replace(/,/g, '') })), x: vals.map(fmtV).join(', ') + '.', act: async () => seqGrow(W) }, ...(o.more || [])],
     w: [top + ':  ' + vals.map(fmtV).join(', ') + (o.series ? '   Series: ' + vals.map(fmtV).join(' + ') + ' + …' : '')] };
 }
 const rec = (a1, f, n = 5) => { const v = [a1]; for (let k = 2; k <= n; k++) v.push(f(v[k - 2], k, v)); return v; };
