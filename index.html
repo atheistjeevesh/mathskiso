@@ -46,7 +46,7 @@
   }
   @media (max-height: 560px) { .how { display: none; } }
   @media (min-width: 701px) and (max-height: 860px) { .ch { background: var(--bg); grid-template-rows: 1fr; align-content: center; padding: 10px 12px; } .ch .pic { display: none; } .ch .cn { display: inline-block; background: var(--ink); color: var(--panel); font: 800 12px/1 var(--font-display); padding: 4px 6px; margin-right: 8px; vertical-align: 3px; } .ch .k { margin: 0 0 6px; } .ch b { font-size: clamp(14px, 1.45vw, 18px); white-space: normal; line-height: 1.15; } .ch .bar2 { margin-top: 8px; } .ch { display: flex; flex-direction: column; justify-content: center; } .ch b .f { display: none; } .ch b .s { display: inline; } .ch .k { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } }
-  @media (min-width: 701px) and (max-height: 680px) { .ch b .f { display: none; } .ch b .s { display: inline; } .ch { padding: 6px 10px; } }
+  @media (min-width: 701px) and (max-height: 800px) { .ch b .f { display: none; } .ch b .s { display: inline; } .ch { padding: 6px 10px; } .ch .k { margin: 0 0 3px; font-size: 9.5px; line-height: 11px; } .ch .bar2 { margin-top: 5px; height: 6px; } .ch b { white-space: normal; } }
   .how { overflow: hidden; } .how ul { font-size: 12px; line-height: 16px; }
   @media (max-height: 700px) { .how ul li:nth-child(n+2) { display: none; } }
 </style>
@@ -91,8 +91,10 @@ const CHS = [
   { n: '12-9', file: 'c12ch9', b: 'XII · 9', t: 'Differential Equations', s: 'Differential Eqns', big: 'dy/dx = F', img: 'kimmy-excited', k: 'Class 12 · slope fields' },
   { n: '12-10', file: 'c12ch10', b: 'XII · 10', t: 'Vector Algebra', big: 'a⃗ × b⃗', img: 'jess-thinking', k: 'Class 12 · dot · cross' },
   { n: '12-11', file: 'c12ch11', b: 'XII · 11', t: 'Three Dimensional Geometry', s: '3D Lines', big: 'a⃗ + λb⃗', img: 'kimmy-lookup', k: 'Class 12 · skew lines' },
+  { n: '12-12', file: 'c12ch12', b: 'XII · 12', t: 'Linear Programming', s: 'Linear Programming', big: 'max Z', img: 'jess-happy', k: 'Class 12 · corners · profit' },
+  { n: '12-13', file: 'c12ch13', b: 'XII · 13', t: 'Probability', big: 'P(E|F)', img: 'kimmy-playful', k: 'Class 12 · given · Bayes' },
 ];
-const BG = ['--sakura', '--sora-tint', '--peach', '--matcha-tint', '--kin-tint', '--sora-tint', '--peach', '--matcha-tint', '--sakura', '--kin-tint', '--matcha-tint', '--sakura', '--sora-tint', '--peach', '--kin-tint', '--sakura', '--matcha-tint', '--sora-tint', '--peach', '--kin-tint', '--matcha-tint', '--sakura', '--sora-tint', '--peach', '--kin-tint'];
+const BG = ['--sakura', '--sora-tint', '--peach', '--matcha-tint', '--kin-tint', '--sora-tint', '--peach', '--matcha-tint', '--sakura', '--kin-tint', '--matcha-tint', '--sakura', '--sora-tint', '--peach', '--kin-tint', '--sakura', '--matcha-tint', '--sora-tint', '--peach', '--kin-tint', '--matcha-tint', '--sakura', '--sora-tint', '--peach', '--kin-tint', '--matcha-tint', '--sakura'];
 const get = (k, d) => { try { const v = localStorage.getItem('kisoM:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
 const set = (k, v) => { try { localStorage.setItem('kisoM:' + k, JSON.stringify(v)); } catch (e) { } };
 const prog = get('chapters', {}); let pts = 0, cleared = 0;

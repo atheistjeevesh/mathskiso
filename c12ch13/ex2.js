@@ -5,10 +5,11 @@
 /* hyps: [{ n, prior, like }] (rationals). o: { aname, kind: 'bayes' | 'total', target, steps: [parts], all: true (ask every posterior) } */
 function areaQ(ex, n, q, hyps, aname, o = {}) {
   const B = bayes(hyps), kind = o.kind || 'bayes', tgt = o.target != null ? o.target : 0;
-  const parts = [runP(async (W) => { areaSet(W, hyps, aname, { hideP: null }); SFX.pop(); await wait(AUTO ? 0.05 : 0.3); }), ...(o.steps || []),
+  const stp = o.steps || [], nums = stp.filter((p) => p.k === 'num'), lab = (q) => q.replace(/ = \?$/, '').split(/(?<=\.) /).pop().split(': ').pop();
+  const stepParts = nums.length >= 2 ? [{ k: 'fields', q: 'First, the likelihoods', f: nums.map((p) => ({ l: lab(p.q), a: p.a, show: p.show, tol: p.tol })), x: nums.map((p) => p.x).filter(Boolean).join(' '), keys: '' }] : stp;
+  const parts = [runP(async (W) => { areaSet(W, hyps, aname, { hideP: null }); SFX.pop(); await wait(AUTO ? 0.05 : 0.3); }), ...stepParts,
     runP(async (W) => { await areaIn(W); }),
-    pfld('Shaded area of each strip = P(hypothesis) · P(' + aname + ' | hypothesis)', hyps.map((h, i) => [h.n, B.j[i]]), 'Prior times likelihood, strip by strip.'),
-    { ...pnum('Total shaded area = P(' + aname + ') = ?', B.tot, 'Theorem of total probability: add the shaded areas.'), act: async (W) => { W.showJ = true; } }];
+    { ...pfld('Shaded area of each strip = P(hypothesis) · P(' + aname + ' | hypothesis), and the total = P(' + aname + ')', [...hyps.map((h, i) => [h.n, B.j[i]]), ['total', B.tot]], 'Prior times likelihood, strip by strip; the total is the theorem of total probability.'), act: async (W) => { W.showJ = true; } }];
   if (kind === 'bayes') {
     if (o.all) parts.push(pfld('Posterior of each hypothesis = its share of the shaded area', hyps.map((h, i) => [h.n, B.post[i]]), 'Bayes: strip area ÷ total area.'));
     else parts.push({ k: 'task', q: 'Tap the strip: ' + hyps[tgt].n, todo: 'Tap that strip on the picture.', pre: async (W) => { W.tapOn = true; W.pick = -1; }, check: (W) => W.pick === tgt, auto: (W) => (W.pick = tgt), reveal: (W) => (W.pick = tgt), act: async (W) => { W.tapOn = false; W.post = true; } },

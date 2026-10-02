@@ -1,6 +1,6 @@
 # Kiso Maths · Class 11
 
-Interactive, simulation-first lessons for NCERT Class 11 Mathematics, Chapters 1–14, plus Class 12 Parts 1 and 2 (Chapters 1–11), in the Kiso style (Jeevesh and Kimmy, manga panels, Kahoot-style speed rounds).
+Interactive, simulation-first lessons for NCERT Class 11 Mathematics, Chapters 1–14, plus Class 12 (Chapters 1–13), in the Kiso style (Jeevesh and Kimmy, manga panels, Kahoot-style speed rounds).
 
 Open `index.html` in a browser (any static server works, for example `python3 -m http.server`).
 
@@ -31,6 +31,8 @@ Open `index.html` in a browser (any static server works, for example `python3 -m
 | `c12ch9.html` | Class 12 · Differential Equations | derivative tower for order and degree, slope fields where a tap releases a solution curve and the textbook answer glows on top of it, residual meter for verification |
 | `c12ch10.html` | Class 12 · Vector Algebra | compass-snapping arrows, tip-to-tail sums, swing b⃗ until a⃗·b⃗ = 0 with a projection shadow, cross products standing up from their parallelograms in orbitable 3D |
 | `c12ch11.html` | Class 12 · Three Dimensional Geometry | riders sliding along r⃗ = a⃗ + λb⃗, angle arcs between lines, two-slider hunt for the shortest distance between skew lines |
+| `c12ch12.html` | Class 12 · Linear Programming | constraint lines that draw themselves, shaded feasible region, tap-to-evaluate corners, a sliding profit line that leaves at the optimal corner, unbounded and infeasible cases |
+| `c12ch13.html` | Class 12 · Probability | tap outcomes into events and shrink the universe for “given F”, a Venn plus proportional bar that stretches for P(A|B), shrinking-bar draw chains, the area model for total probability and Bayes |
 
 Every in-text example and every exercise question (including Miscellaneous) is implemented, split into small steps where needed.
 
@@ -41,6 +43,8 @@ Every in-text example and every exercise question (including Miscellaneous) is i
 - `shared/kiso.css` — design tokens and no-scroll layout
 - `chN/sims.js`, `chN/lessons.js`, `chN/exercises.js` — per-chapter sims, concept lessons and question banks
 - `m/` — mascot artwork
+
+Every page has a ⏱ timer button (also on the hub): switch it off to think at your own pace; each right answer then scores a flat 750 and the choice is remembered.
 
 Append `?auto` to a chapter URL to watch the autopilot play through (used for testing).
 

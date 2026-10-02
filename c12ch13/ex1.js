@@ -18,9 +18,8 @@ function condO(ex, n, q, spFn, asks, o = {}) {
     const nb = wsum(sp, k.B), nab = wsum(sp, (it) => k.A(it) && k.B(it)), r = Qr(nab, nb), setup = (W) => { W.sets = { E: k.A, F: k.B }; W.setNames = { E: k.a, F: k.b }; W.vis = { E: 0, F: 0, G: 0 }; W.given = null; W.sel = new Set(); };
     parts.push(runP(async (W) => { setup(W); SFX.pop(); await wait(AUTO ? 0.05 : 0.2); }));
     if (ai === 0 || o.tapEach) parts.push(tapP('Tap every outcome in ' + k.b + ' (what we are told has happened)', k.B, { x: k.b + ' has ' + (wt ? 'probability ' + qs(Qr(nb, tot)) : nb + ' outcomes') + '.' }));
-    parts.push(runP(async (W) => { W.vis.F = 1; SFX.pop(); await wait(AUTO ? 0.05 : 0.2); }));
-    parts.push(wt ? pnum('P(' + k.b + ') = ?', Qr(nb, tot), 'Add the probabilities of the outcomes in ' + k.b + '.', { act: async (W) => { W.vis.E = 1; } }) : pnum('n(' + k.b + ') = ?', Qr(nb), 'Count the outcomes in ' + k.b + '.', { act: async (W) => { W.vis.E = 1; } }));
-    parts.push(wt ? pnum('P(' + k.a + ' ∩ ' + k.b + ') = ?', Qr(nab, tot), 'The outcomes in both colours.', {}) : pnum('n(' + k.a + ' ∩ ' + k.b + ') = ?', Qr(nab), 'The overlap (gold cells).', {}));
+    parts.push(runP(async (W) => { W.vis.F = 1; W.vis.E = 1; SFX.pop(); await wait(AUTO ? 0.05 : 0.2); }));
+    parts.push(wt ? pfld('P(' + k.b + ') and P(' + k.a + ' ∩ ' + k.b + ') (the gold overlap)', [['P(' + k.b + ')', Qr(nb, tot)], ['P(' + k.a + '∩' + k.b + ')', Qr(nab, tot)]], 'Add the probabilities of the outcomes.') : pfld('Count: n(' + k.b + ') and n(' + k.a + ' ∩ ' + k.b + ') (the gold overlap)', [['n(' + k.b + ')', Qr(nb)], ['n(' + k.a + '∩' + k.b + ')', Qr(nab)]], 'Count the outcomes in ' + k.b + ', then those also in ' + k.a + '.'));
     parts.push(runP(async (W) => { W.given = 'F'; SFX.whoosh(); await wait(AUTO ? 0.05 : 0.7); }));
     parts.push(pnum('P(' + k.a + ' | ' + k.b + ') = ?', r, (wt ? 'P(' + k.a + '∩' + k.b + ')/P(' + k.b + ') = ' + qs(Qr(nab, tot)) + '/' + qs(Qr(nb, tot)) : 'n(' + k.a + '∩' + k.b + ')/n(' + k.b + ') = ' + nab + '/' + nb) + ' = ' + qs(r) + '.' + (o.note ? ' ' + o.note : '')));
     if (ai < asks.length - 1) parts.push(runP(async (W) => { W.given = null; W.sel = new Set(); }));
@@ -41,13 +40,18 @@ function vnQ(ex, n, q, a, b, ab, asks, o = {}) {
   const names = o.names || ['A', 'B'], hide = {}; (o.hide || []).forEach((k) => (hide[k] = 1));
   const parts = [runP(async (W) => { SFX.pop(); await wait(AUTO ? 0.05 : 0.3); })];
   if (o.pre) parts.push(...o.pre);
-  asks.forEach((k) => { parts.push(runP(async (W) => { W.given = null; W.zoom = 0; })); if (k.mq) parts.push(k.mq); parts.push({ ...pnum(k.q, k.r, k.x, k.opt || {}), act: async (W) => { (k.reveal || []).forEach((h) => delete W.hide[h]); if (k.given) await vennGiven(W, k.given); } }); if (k.tf) parts.push(k.tf); });
+  const grp = []; asks.forEach((k) => { const last = grp[grp.length - 1]; if (!k.given && !k.mq && !k.tf && last && !last[0].given && !last[0].tf && !last[0].mq) last.push(k); else grp.push([k]); });
+  const solo = (k) => { parts.push(runP(async (W) => { W.given = null; W.zoom = 0; })); if (k.mq) parts.push(k.mq); parts.push({ ...pnum(k.q, k.r, k.x, k.opt || {}), act: async (W) => { (k.reveal || []).forEach((h) => delete W.hide[h]); if (k.given) await vennGiven(W, k.given); } }); if (k.tf) parts.push(k.tf); };
+  grp.forEach((g) => { if (g.length >= 2) { parts.push(runP(async (W) => { W.given = null; W.zoom = 0; })); parts.push({ k: 'fields', q: 'Work these out', f: g.map((k) => ({ l: k.q.replace(/ = [?].*$/, '').replace(/^\([ivx]+\) /, '').replace(/^\([a-c]\) /, ''), a: qv(k.r), show: qshow(k.r), tol: ptol(qv(k.r)) })), x: g.map((k) => k.x).filter(Boolean).join(' '), keys: '', act: async (W) => { g.forEach((k) => (k.reveal || []).forEach((h) => delete W.hide[h])); } }); } else solo(g[0]); });
   return { ex, n, q, scene: 'venn', setup: (W) => { vennSet(W, a, b, ab, { names, hide }); }, parts, w: [o.w || asks.map((k) => k.q.replace(/ = \?.*/, '') + ' = ' + qs(k.r)).join('; ')], kim: o.kim };
 }
 /* a chain of conditional steps: answer each factor, the bar shrinks, then the product (and any follow-ups) */
 function chainQ(ex, n, q, steps, o = {}) {
   const parts = [runP(async (W) => { shrinkSet(W, steps, { title: o.title || '' }); SFX.pop(); await wait(AUTO ? 0.05 : 0.3); })];
-  let cum = Q1; steps.forEach((s, i) => { cum = qmul(cum, s.p); const c = cum; parts.push({ ...pnum(s.q || 'Factor ' + (i + 1) + ': ' + s.lab + ' = ?', s.p, s.x || ''), act: async (W) => { SFX.swish(); await tw(W, { k: i + 1, duration: AUTO ? 0.05 : 0.7, ease: 'power1.inOut' }); } }); });
+  let cum = Q1; steps.forEach((s) => { cum = qmul(cum, s.p); });
+  const lab = (t) => t.length > 22 ? t.split(' | ')[0] : t;
+  if (steps.length >= 2) parts.push(pfld('Each factor of the chain', steps.map((s) => [lab(s.lab), s.p]), steps.map((s) => s.x).filter(Boolean).join(' ')), runP(async (W) => { SFX.swish(); await tw(W, { k: steps.length, duration: AUTO ? 0.05 : 0.5 * steps.length, ease: 'none' }); }));
+  else steps.forEach((s, i) => { parts.push({ ...pnum(s.q || 'Factor ' + (i + 1) + ': ' + s.lab + ' = ?', s.p, s.x || ''), act: async (W) => { SFX.swish(); await tw(W, { k: i + 1, duration: AUTO ? 0.05 : 0.7, ease: 'power1.inOut' }); } }); });
   parts.push(pnum(o.fq || 'Multiply: the probability of the whole chain = ?', cum, o.fx || 'P(E∩F∩…) = P(E)·P(F|E)·…'));
   const out = [...parts]; let fin = cum; (o.after || []).forEach((k) => { out.push(pnum(k.q, k.r, k.x || '')); fin = k.r; });
   return { ex, n, q, scene: 'shrink', setup: (W) => { shrinkSet(W, steps, { title: o.title || '' }); W.k = 0; }, parts: out, w: [o.w || 'P = ' + qs(fin)], chainP: cum };
