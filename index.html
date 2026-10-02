@@ -61,7 +61,7 @@
     </div>
     <div class="art" aria-hidden="true"><div><img src="m/jess-body.png" alt="" width="29" height="76"></div><div><img src="m/kimmy-sit.png" alt="" width="61" height="76"></div></div>
   </header>
-  <div class="mtools"><span class="prog" id="tot"></span><span class="xp" id="xp"></span><button class="pill snd" type="button" id="snd">🔇 Sound</button></div>
+  <div class="mtools"><span class="prog" id="tot"></span><span class="xp" id="xp"></span><button class="pill tmr" type="button" id="tmr" title="Turn the timer off to think in peace">⏱ On</button><button class="pill snd" type="button" id="snd">🔇 Sound</button></div>
   <nav class="chs" id="chs" aria-label="Chapters"></nav>
 </div>
 <script>
@@ -112,6 +112,9 @@ document.getElementById('tot').textContent = cleared + ' of ' + CHS.length + ' c
 document.getElementById('xp').textContent = pts ? '★ ' + pts.toLocaleString() + ' pts' : '';
 const sb = document.getElementById('snd'); let muted = get('muted', true);
 const paint = () => { sb.textContent = muted ? '🔇 Sound' : '🔊 Sound'; sb.setAttribute('aria-pressed', !muted); };
+const tb = document.getElementById('tmr'); let noT = get('notimer', false);
+const paintT = () => { tb.textContent = noT ? '⏱ Off' : '⏱ On'; tb.setAttribute('aria-pressed', !noT); };
+paintT(); tb.onclick = () => { noT = !noT; set('notimer', noT); paintT(); };
 paint(); sb.onclick = () => { muted = !muted; set('muted', muted); paint(); };
 </script>
 </body>

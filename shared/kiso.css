@@ -244,3 +244,5 @@ sup, sub { font-size: .7em; line-height: 0; }
 .gate h2 { margin: 0; font: 800 28px/1 var(--font-display); letter-spacing: -0.03em; }
 .gate img { height: 110px; justify-self: center; }
 @media (prefers-reduced-motion: reduce) { .speed { display: none; } }
+
+.notimer .timer { display: none; }

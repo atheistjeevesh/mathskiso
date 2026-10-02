@@ -21,7 +21,7 @@ document.body.insertAdjacentHTML('beforeend', `
     </div>
     <div class="art" aria-hidden="true"><div><img src="m/jess-body.png" alt="" width="29" height="76"></div><div><img src="m/kimmy-sit.png" alt="" width="61" height="76"></div></div>
   </header>
-  <div class="mtools"><a class="pill" href="index.html">← All chapters</a><span class="prog" id="mapProg"></span><span class="xp" id="mapXp"></span><button class="pill snd" type="button" aria-pressed="false">Sound</button></div>
+  <div class="mtools"><a class="pill" href="index.html">← All chapters</a><span class="prog" id="mapProg"></span><span class="xp" id="mapXp"></span><button class="pill tmr" type="button" aria-pressed="false">Timer</button><button class="pill snd" type="button" aria-pressed="false">Sound</button></div>
   <nav id="path" aria-label="Lessons"></nav>
 </div>
 <div class="app" id="player" hidden>
@@ -31,6 +31,7 @@ document.body.insertAdjacentHTML('beforeend', `
     <div class="segs" id="segs" aria-label="Lesson progress"></div>
     <span class="score" id="score"><span>pts </span><b>0</b></span>
     <span class="streak" id="streak"><span>streak </span><b>0</b></span>
+    <button class="pill tmr" type="button" aria-pressed="false">Timer</button>
     <button class="pill snd" type="button" aria-pressed="false">Sound</button>
   </div>
   <div class="stage" id="stage">
@@ -95,6 +96,7 @@ const IMG = {};
    SOUND BOARD (WebAudio synth, no files) + haptics
    ========================================================= */
 let muted = GStore.get('muted', true), AC = null, NOISE = null;
+let noTimer = GStore.get('notimer', false); const TOFF = () => noTimer && !AUTO;
 function actx() { if (muted) return null; try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { return null; } return AC; }
 function tone(f, d, type = 'square', v = 0.05, slide = 0, delay = 0) {
   const ac = actx(); if (!ac) return; const t0 = ac.currentTime + delay;
@@ -303,9 +305,9 @@ const SHAPES = ['<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 22 2
 function timerEl(time) { const bar = h('i'), num = h('span', null, String(time)), bonus = h('em', null, '+1000'); const el = h('div', { class: 'timer' }, bar, num, bonus); return { el, bar, num, bonus }; }
 function runTimer(tm, time, t0, hard) {
   let left = time; const g = gsap.to(tm.bar, { scaleX: 0, duration: AUTO ? 0.01 : time, ease: 'none' });
-  return { step() { const el = T - t0; const l = Math.ceil(time - el); tm.bonus.textContent = '+' + ptsFor(el, time, 1); if (l !== left) { left = l; tm.num.textContent = Math.max(0, l) || (hard ? 0 : 'OT'); if (l <= 3 && l > 0) { SFX.tock(); tm.el.classList.add('hot'); } } return el >= time; }, kill() { g.kill(); } };
+  return { step() { if (TOFF()) return false; const el = T - t0; const l = Math.ceil(time - el); tm.bonus.textContent = '+' + ptsFor(el, time, 1); if (l !== left) { left = l; tm.num.textContent = Math.max(0, l) || (hard ? 0 : 'OT'); if (l <= 3 && l > 0) { SFX.tock(); tm.el.classList.add('hot'); } } return el >= time; }, kill() { g.kill(); } };
 }
-const ptsFor = (t, time, mult = 1) => Math.round((500 + 500 * (1 - clamp(t / time, 0, 1))) * mult);
+const ptsFor = (t, time, mult = 1) => TOFF() ? Math.round(750 * mult) : Math.round((500 + 500 * (1 - clamp(t / time, 0, 1))) * mult);
 const autoPickWrong = () => AUTO_MIX && Math.random() < 0.25;
 async function kahoot(q, opts, correct, time = 20) {
   const g = GEN; const qEl = H('p', 'q', q); const tm = timerEl(time); const short = opts.every((o) => plain(o).length < 14);
@@ -633,6 +635,8 @@ function boot() {
   LESSONS.forEach((l, i) => { l.num = LESSONS.filter((x, k) => k <= i && x.kind !== 'ex').length; });
   $('#back').onclick = () => { SFX.pop(); showMap(); };
   const setSnd = () => document.querySelectorAll('.snd').forEach((x) => { x.setAttribute('aria-pressed', !muted); x.textContent = muted ? '🔇 Sound' : '🔊 Sound'; });
+  const setTmr = () => { document.body.classList.toggle('notimer', noTimer && !AUTO); document.querySelectorAll('.tmr').forEach((x) => { x.setAttribute('aria-pressed', !noTimer); x.textContent = noTimer ? '⏱ Off' : '⏱ On'; x.title = noTimer ? 'Timer is off: take as long as you like (flat 750 points per answer)' : 'Turn the timer off to think in peace'; }); };
+  setTmr(); for (const b of document.querySelectorAll('.tmr')) b.onclick = () => { noTimer = !noTimer; GStore.set('notimer', noTimer); setTmr(); SFX.pop(); };
   setSnd(); for (const b of document.querySelectorAll('.snd')) b.onclick = () => { muted = !muted; GStore.set('muted', muted); setSnd(); SFX.pop(); };
   addEventListener('keydown', (e) => { if (playerEl.hidden) return; if (e.key === 'Enter') { const b = sheet.querySelector('.btn.go'); if (b) b.click(); } if (['1', '2', '3', '4'].includes(e.key) && !sheet.querySelector('.numq')) { const t = sheet.querySelectorAll('.tile:not(:disabled)')[+e.key - 1]; if (t) t.click(); } });
   if (RM && window.gsap) gsap.globalTimeline.timeScale(4);
